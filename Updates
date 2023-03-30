@@ -1,0 +1,1 @@
+[2023/03/30] UPDATE: When a new card is detected, it reads the card's information and prints it to the serial monitor. The information includes the card's unique identifier, the manufacturer, and the chip type. Finally, the code halts the communication with the card and stops encryption.
