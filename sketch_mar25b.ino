@@ -33,14 +33,23 @@ void dumpInfoToSerial(MFRC522::Uid uid) {
   Serial.print("Manufacturer: ");
   Serial.println(manufacturerName);
 
-  byte chipType = uid.uidByte[1];
+  byte chipType = uid.uidByte[2];
   String chipTypeName;
   switch(chipType) {
+    case 0x04:
+      chipTypeName = "MIFARE Ultralight";
+      break;
+    case 0x02:
+      chipTypeName = "MIFARE Mini";
+      break;
     case 0x08:
       chipTypeName = "MIFARE Classic 1K";
       break;
     case 0x18:
       chipTypeName = "MIFARE Classic 4K";
+      break;
+    case 0x44:
+      chipTypeName = "MIFARE DESFire";
       break;
     default:
       chipTypeName = "Unknown";
@@ -48,8 +57,15 @@ void dumpInfoToSerial(MFRC522::Uid uid) {
   Serial.print("Chip Type: ");
   Serial.println(chipTypeName);
 
-  Serial.print("Unique Serial Number: ");
-  for (byte i = 2; i < 4; i++) {
+  unsigned long uniqueSerialNumber = (unsigned long)uid.uidByte[0] << 24 |
+                                      (unsigned long)uid.uidByte[1] << 16 |
+                                      (unsigned long)uid.uidByte[2] << 8 |
+                                      (unsigned long)uid.uidByte[3];
+  Serial.print("Unique Serial Number (decimal): ");
+  Serial.println(uniqueSerialNumber);
+
+  Serial.print("Unique Serial Number (hexadecimal): ");
+  for (byte i = 0; i < 4; i++) {
     Serial.print(uid.uidByte[i] < 0x10 ? "0" : "");
     Serial.print(uid.uidByte[i], HEX);
   }
