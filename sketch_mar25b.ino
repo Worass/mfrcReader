@@ -14,7 +14,7 @@ void setup() {
 }
 
 void dumpInfoToSerial(MFRC522::Uid uid) {
-  Serial.print("Card UID: ");
+  Serial.print(F("Card UID: "));
   for (byte i = 0; i < 4; i++) {
     Serial.print(uid.uidByte[i] < 0x10 ? "0" : "");
     Serial.print(uid.uidByte[i], HEX);
@@ -25,46 +25,27 @@ void dumpInfoToSerial(MFRC522::Uid uid) {
   String manufacturerName;
   switch(manufacturer) {
     case 0x04:
-      manufacturerName = "NXP Semiconductors";
+      manufacturerName = F("NXP Semiconductors");
       break;
     default:
-      manufacturerName = "Unknown";
+      manufacturerName = F("Unknown");
   }
-  Serial.print("Manufacturer: ");
+  Serial.print(F("Manufacturer: "));
   Serial.println(manufacturerName);
 
-  byte chipType = uid.uidByte[2];
-  String chipTypeName;
-  switch(chipType) {
-    case 0x04:
-      chipTypeName = "MIFARE Ultralight";
-      break;
-    case 0x02:
-      chipTypeName = "MIFARE Mini";
-      break;
-    case 0x08:
-      chipTypeName = "MIFARE Classic 1K";
-      break;
-    case 0x18:
-      chipTypeName = "MIFARE Classic 4K";
-      break;
-    case 0x44:
-      chipTypeName = "MIFARE DESFire";
-      break;
-    default:
-      chipTypeName = "Unknown";
-  }
-  Serial.print("Chip Type: ");
+  MFRC522::PICC_Type chipType = mfrc522.PICC_GetType(uid.sak);
+  String chipTypeName = mfrc522.PICC_GetTypeName(chipType);
+  Serial.print(F("Chip Type: "));
   Serial.println(chipTypeName);
 
   unsigned long uniqueSerialNumber = (unsigned long)uid.uidByte[0] << 24 |
                                       (unsigned long)uid.uidByte[1] << 16 |
                                       (unsigned long)uid.uidByte[2] << 8 |
                                       (unsigned long)uid.uidByte[3];
-  Serial.print("Unique Serial Number (decimal): ");
+  Serial.print(F("Unique Serial Number (decimal): "));
   Serial.println(uniqueSerialNumber);
 
-  Serial.print("Unique Serial Number (hexadecimal): ");
+  Serial.print(F("Unique Serial Number (hexadecimal): "));
   for (byte i = 0; i < 4; i++) {
     Serial.print(uid.uidByte[i] < 0x10 ? "0" : "");
     Serial.print(uid.uidByte[i], HEX);
@@ -76,7 +57,7 @@ void loop() {
   // Look for new cards
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     // Print a dividing line between scanned cards
-    Serial.println("--------------------");
+    Serial.println(F("--------------------"));
 
     // Dump detailed information about the card
     dumpInfoToSerial(mfrc522.uid);
