@@ -66,6 +66,34 @@ CardInfo getCardInfo(MFRC522::Uid uid) {
   return cardInfo;
 }
 
+// Function to read and print the contents of all card blocks
+void readCardBlocks() {
+  byte blockAddr = 0;
+  byte status;
+  byte buffer[18];
+  byte size = sizeof(buffer);
+
+  Serial.println("Card Blocks:");
+  while (blockAddr < 256) {
+    Serial.print("Block ");
+    Serial.print(blockAddr);
+    Serial.print(": ");
+    status = mfrc522.MIFARE_Read(blockAddr, buffer, &size);
+    if (status!= MFRC522::STATUS_OK) {
+      Serial.print("Read failed: ");
+      Serial.println(mfrc522.GetStatusCodeName(status));
+      break;
+    } else {
+      for (byte i = 0; i < 16; i++) {
+        Serial.print(buffer[i], HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
+    blockAddr++;
+  }
+}
+
 void setup() {
   // Start serial communication at 9600 baud
   Serial.begin(9600);
@@ -93,9 +121,14 @@ void loop() {
     CardInfo cardInfo = getCardInfo(mfrc522.uid);
     printCardInfo(cardInfo);
 
-    // Halt communication with the card and stop encryption
-    mfrc522.PICC_HaltA();
+    // Try to bypass authentication by not authenticating
     mfrc522.PCD_StopCrypto1();
+
+    // Read and print the contents of all card blocks
+    readCardBlocks();
+
+    // Halt communication with the card
+    mfrc522.PICC_HaltA();
 
     // Add a small delay before checking for the next card
     delay(500);
