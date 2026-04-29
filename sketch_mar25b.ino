@@ -96,7 +96,7 @@ void readCardBlocks() {
 
 void setup() {
   // Start serial communication at 9600 baud
-  Serial.begin(9600);
+  Serial.begin(9500);
 
   // Wait for the serial port to connect (needed for some boards)
   while (!Serial) {
